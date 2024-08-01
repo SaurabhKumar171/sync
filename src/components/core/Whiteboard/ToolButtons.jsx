@@ -1,7 +1,7 @@
 import React, { useState } from 'react'
 import { TOOLS } from '../../../utils/Constants'
 
-const ToolButtons = ({ tool, handleToolChange, fillColor, setFillColor }) => {
+const ToolButtons = ({ tool, handleToolChange, fillColor, setFillColor, fillInnerColor, setFillInnerColor }) => {
 
   return (
     <div className='border border-black w-4/12'>
@@ -80,6 +80,18 @@ const ToolButtons = ({ tool, handleToolChange, fillColor, setFillColor }) => {
                 className='w-6 h-6'
           />
       </button>
+
+      {
+        (tool === TOOLS?.CIRCLE || tool === TOOLS?.RECTANGLE )  &&   
+         <button>
+              <input
+                    value={fillInnerColor}
+                    onChange={(e) => setFillInnerColor(e.target.value)}
+                    type='color'
+                    className='w-6 h-6'
+              />
+          </button>
+      }
 
       <button>
                     

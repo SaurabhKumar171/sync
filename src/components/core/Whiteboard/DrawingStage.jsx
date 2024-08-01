@@ -3,7 +3,7 @@ import { Arrow, Circle,  Layer, Line, Rect, Stage, Text , Transformer } from 're
 import { v4 as uuidv4 } from 'uuid';
 import { TOOLS } from '../../../utils/Constants';
 
-const DrawingStage = ({ tool, scribble, setScribble, fillColor }) => {
+const DrawingStage = ({ tool, scribbles, setScribbles, rectangles, setRectangles, fillColor, fillInnerColor }) => {
   const isDrawing = useRef(false);
   const stageRef = useRef();
   const cuurentShapeId = useRef();
@@ -11,29 +11,43 @@ const DrawingStage = ({ tool, scribble, setScribble, fillColor }) => {
   const handleMouseDown = (e) => {
 
     // If drawing i disabled or tools is SELECT then do not daw anything
-    if(TOOLS?.SELECT === tool || !isDrawing) return;
+    if(TOOLS?.SELECT === tool) return;
+
+    isDrawing.current = true;
 
     const stage = stageRef.current;
-    const { x, y } = stage.getPointerPosition();
-    // const pos = e.target.getStage().getPointerPosition();
-    // setScribble([...scribble, { tool, points: [pos.x, pos.y], color : fillColor }]);
+    const { x, y } = stage.getStage().getPointerPosition();
+ 
     
     const id = uuidv4();
 
     cuurentShapeId.current = id;
-    isDrawing.current = true;
 
     switch(tool){
       case TOOLS.SCRIBBLE : 
-        setScribble((scribble) => [
+        setScribbles((scribble) => [
                       ...scribble, 
                       { 
                         id, 
-                        tool, 
                         points: [x, y], 
                         color : fillColor 
                       }
                     ]);
+        break;
+      
+      case TOOLS.RECTANGLE : 
+        setRectangles((rectangle) => [
+                        ...rectangle, 
+                        { 
+                          id, 
+                          x, 
+                          y,
+                          width: 20,
+                          height: 20,
+                          color : fillColor,
+                          fill : fillInnerColor,
+                        }
+                      ]);
         break;
 
       default:
@@ -45,20 +59,20 @@ const DrawingStage = ({ tool, scribble, setScribble, fillColor }) => {
   const handleMouseMove = (e) => {
 
       // If drawing i disabled or tools is SELECT then do not daw anything
-      if(TOOLS?.SELECT === tool || !isDrawing) return;
+      if(TOOLS?.SELECT === tool || !isDrawing.current) return;
 
       const stage = stageRef.current;
-      const { x, y } = stage.getPointerPosition();
+      const { x, y } = stage.getStage().getPointerPosition();
 
 
       switch(tool){
         case TOOLS.SCRIBBLE : 
-          setScribble((scribble) => 
+          setScribbles((scribble) => 
             scribble.map((scribbleItem) => {
               if(scribbleItem.id === cuurentShapeId.current){
                 return {
                   ...scribbleItem,
-                  points: [...scribbleItem.points, [x, y]],
+                  points: [...scribbleItem.points, x, y],
                   color : fillColor
                 }
               }
@@ -66,6 +80,21 @@ const DrawingStage = ({ tool, scribble, setScribble, fillColor }) => {
             })
           );
           break;
+
+        case TOOLS.RECTANGLE : 
+          setRectangles((rectangle) => 
+              rectangle.map((rectangleItem) => {
+                if(rectangleItem.id === cuurentShapeId.current){
+                  return {
+                    ...rectangleItem,
+                    width : x - rectangleItem.x,
+                    height : y - rectangleItem.y,
+                  }
+                }
+                return rectangleItem;
+              })
+            );
+            break;
   
         default:
             break;
@@ -90,20 +119,40 @@ const DrawingStage = ({ tool, scribble, setScribble, fillColor }) => {
   >
       <Layer>
         <Text text="Just start drawing" x={5} y={30} />
-        {scribble.map((line, i) => (
-          <Line
-            key={i}
-            points={line.points}
-            stroke={line.color}
-            strokeWidth={5}
-            tension={0.5}
-            lineCap="round"
-            lineJoin="round"
-            globalCompositeOperation={
-              line.tool === 'eraser' ? 'destination-out' : 'source-over'
-            }
-          />
-        ))}
+        
+        {
+          scribbles.map((line, i) => (
+            <Line
+              key={i}
+              points={line.points}
+              stroke={line.color}
+              strokeWidth={5}
+              tension={0.5}
+              lineCap="round"
+              lineJoin="round"
+              globalCompositeOperation={
+                line.tool === 'eraser' ? 'destination-out' : 'source-over'
+              }
+            />
+          ))
+        }
+
+        {
+          rectangles.map((rectangle, i) => (
+            <Rect
+              key={i}
+              x={rectangle.x}
+              y={rectangle.y}
+              width={rectangle.width}
+              height={rectangle.height}
+              stroke={rectangle.color}
+              fill={rectangle.fill}
+              strokeWidth={5}
+              lineCap="round"
+            />
+          ))
+        }
+
       </Layer>
   </Stage>
   )
