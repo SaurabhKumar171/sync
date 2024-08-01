@@ -1,31 +1,75 @@
-import React, { useRef, useState } from 'react';
+import React, { useRef } from 'react';
 import { Arrow, Circle,  Layer, Line, Rect, Stage, Text , Transformer } from 'react-konva';
 import { v4 as uuidv4 } from 'uuid';
 import { TOOLS } from '../../../utils/Constants';
 
-const DrawingStage = ({ tool, lines, setLines, fillColor }) => {
+const DrawingStage = ({ tool, scribble, setScribble, fillColor }) => {
   const isDrawing = useRef(false);
+  const stageRef = useRef();
+  const cuurentShapeId = useRef();
 
   const handleMouseDown = (e) => {
+
+    // If drawing i disabled or tools is SELECT then do not daw anything
+    if(TOOLS?.SELECT === tool || !isDrawing) return;
+
+    const stage = stageRef.current;
+    const { x, y } = stage.getPointerPosition();
+    // const pos = e.target.getStage().getPointerPosition();
+    // setScribble([...scribble, { tool, points: [pos.x, pos.y], color : fillColor }]);
+    
+    const id = uuidv4();
+
+    cuurentShapeId.current = id;
     isDrawing.current = true;
-    const pos = e.target.getStage().getPointerPosition();
-    setLines([...lines, { tool, points: [pos.x, pos.y], color : fillColor }]);
+
+    switch(tool){
+      case TOOLS.SCRIBBLE : 
+        setScribble((scribble) => [
+                      ...scribble, 
+                      { 
+                        id, 
+                        tool, 
+                        points: [x, y], 
+                        color : fillColor 
+                      }
+                    ]);
+        break;
+
+      default:
+          break;
+    }
+
   };
 
   const handleMouseMove = (e) => {
-      // no drawing - skipping
-      if (!isDrawing.current) {
-        return;
-      }
-      const stage = e.target.getStage();
-      const point = stage.getPointerPosition();
-      let lastLine = lines[lines.length - 1];
-      // add point
-      lastLine.points = lastLine.points.concat([point.x, point.y]);
 
-      // replace last
-      lines.splice(lines.length - 1, 1, lastLine);
-      setLines(lines.concat());
+      // If drawing i disabled or tools is SELECT then do not daw anything
+      if(TOOLS?.SELECT === tool || !isDrawing) return;
+
+      const stage = stageRef.current;
+      const { x, y } = stage.getPointerPosition();
+
+
+      switch(tool){
+        case TOOLS.SCRIBBLE : 
+          setScribble((scribble) => 
+            scribble.map((scribbleItem) => {
+              if(scribbleItem.id === cuurentShapeId.current){
+                return {
+                  ...scribbleItem,
+                  points: [...scribbleItem.points, [x, y]],
+                  color : fillColor
+                }
+              }
+              return scribbleItem;
+            })
+          );
+          break;
+  
+        default:
+            break;
+      }
   };
 
   const handleMouseUp = () => {
@@ -42,10 +86,11 @@ const DrawingStage = ({ tool, lines, setLines, fillColor }) => {
       onTouchStart={handleMouseDown}
       onTouchMove={handleMouseMove}
       onTouchEnd={handleMouseUp}
+      ref={stageRef}
   >
       <Layer>
         <Text text="Just start drawing" x={5} y={30} />
-        {lines.map((line, i) => (
+        {scribble.map((line, i) => (
           <Line
             key={i}
             points={line.points}

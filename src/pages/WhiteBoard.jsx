@@ -5,7 +5,7 @@ import { TOOLS } from '../utils/Constants';
 
 const WhiteBoard = () => {
   const [tool, setTool] = useState(TOOLS?.SELECT);
-  const [lines, setLines] = useState([]);
+  const [scribble, setScribble] = useState([]);
   const [fillColor, setFillColor] = useState("#ff0000");
 
   const handleToolChange = (tool) => {
@@ -23,8 +23,8 @@ const WhiteBoard = () => {
       />
       <DrawingStage 
         tool={tool} 
-        lines={lines} 
-        setLines={setLines} 
+        scribble={scribble} 
+        setScribble={setScribble} 
         fillColor={fillColor} 
       />
     </div>
