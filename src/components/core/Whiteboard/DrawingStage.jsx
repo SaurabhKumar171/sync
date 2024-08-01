@@ -9,7 +9,7 @@ const DrawingStage = ({ tool, lines, setLines, fillColor }) => {
   const handleMouseDown = (e) => {
     isDrawing.current = true;
     const pos = e.target.getStage().getPointerPosition();
-    setLines([...lines, { tool, points: [pos.x, pos.y] }]);
+    setLines([...lines, { tool, points: [pos.x, pos.y], color : fillColor }]);
   };
 
   const handleMouseMove = (e) => {
@@ -39,6 +39,9 @@ const DrawingStage = ({ tool, lines, setLines, fillColor }) => {
       onMouseDown={handleMouseDown}
       onMousemove={handleMouseMove}
       onMouseup={handleMouseUp}
+      onTouchStart={handleMouseDown}
+      onTouchMove={handleMouseMove}
+      onTouchEnd={handleMouseUp}
   >
       <Layer>
         <Text text="Just start drawing" x={5} y={30} />
@@ -46,7 +49,7 @@ const DrawingStage = ({ tool, lines, setLines, fillColor }) => {
           <Line
             key={i}
             points={line.points}
-            stroke={fillColor}
+            stroke={line.color}
             strokeWidth={5}
             tension={0.5}
             lineCap="round"

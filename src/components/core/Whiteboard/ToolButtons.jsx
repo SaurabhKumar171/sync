@@ -9,7 +9,7 @@ const ToolButtons = ({ tool, handleToolChange, fillColor, setFillColor }) => {
       <button
             className={  
                 `${tool === TOOLS?.SELECT} ? 
-                "bg-[#fff] p-1 rounded": 
+                "text-5xl p-1 border-2 border-richblack-600 rounded": 
                 "p-1 hover:bg-richblack-300 rounded"`
             }
             onClick={() => handleToolChange(TOOLS?.SELECT)}
