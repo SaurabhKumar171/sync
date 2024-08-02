@@ -25,12 +25,14 @@ const DrawingStage = ({ tool, scribbles, setScribbles, rectangles, setRectangles
 
     switch(tool){
       case TOOLS.SCRIBBLE : 
+      case TOOLS.ERASE : 
         setScribbles((scribble) => [
                       ...scribble, 
                       { 
                         id, 
                         points: [x, y], 
-                        color : fillColor 
+                        color : fillColor ,
+                        tool  : tool
                       }
                     ]);
         break;
@@ -67,13 +69,14 @@ const DrawingStage = ({ tool, scribbles, setScribbles, rectangles, setRectangles
 
       switch(tool){
         case TOOLS.SCRIBBLE : 
+        case TOOLS.ERASE : 
           setScribbles((scribble) => 
             scribble.map((scribbleItem) => {
               if(scribbleItem.id === cuurentShapeId.current){
                 return {
                   ...scribbleItem,
                   points: [...scribbleItem.points, x, y],
-                  color : fillColor
+                  // color : fillColor
                 }
               }
               return scribbleItem;
@@ -119,23 +122,6 @@ const DrawingStage = ({ tool, scribbles, setScribbles, rectangles, setRectangles
   >
       <Layer>
         <Text text="Just start drawing" x={5} y={30} />
-        
-        {
-          scribbles.map((line, i) => (
-            <Line
-              key={i}
-              points={line.points}
-              stroke={line.color}
-              strokeWidth={5}
-              tension={0.5}
-              lineCap="round"
-              lineJoin="round"
-              globalCompositeOperation={
-                line.tool === 'eraser' ? 'destination-out' : 'source-over'
-              }
-            />
-          ))
-        }
 
         {
           rectangles.map((rectangle, i) => (
@@ -152,6 +138,25 @@ const DrawingStage = ({ tool, scribbles, setScribbles, rectangles, setRectangles
             />
           ))
         }
+        
+        {
+          scribbles.map((line, i) => (
+            <Line
+              key={i}
+              points={line.points}
+              stroke={line.color}
+              strokeWidth={5}
+              tension={0.5}
+              lineCap="round"
+              lineJoin="round"
+              globalCompositeOperation={
+                line.tool === TOOLS.ERASE ? 'destination-out' : 'source-over'
+              }
+            />
+          ))
+        }
+
+      
 
       </Layer>
   </Stage>
