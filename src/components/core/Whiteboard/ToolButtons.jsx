@@ -1,7 +1,11 @@
 import React, { useState } from 'react'
 import { TOOLS } from '../../../utils/Constants'
+import { useSelector } from 'react-redux';
 
-const ToolButtons = ({ tool, handleToolChange, fillColor, setFillColor, fillInnerColor, setFillInnerColor }) => {
+const ToolButtons = ({ handleToolChange, fillColor, setFillColor, fillInnerColor, setFillInnerColor }) => {
+  const tool = useSelector(state => state.tools);
+
+  console.log(" Tool button", tool);
 
   return (
     <div className='border border-black w-4/12'>

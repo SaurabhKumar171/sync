@@ -1,24 +1,25 @@
 import React, { useState } from 'react';
 import DrawingStage from '../components/core/Whiteboard/DrawingStage';
 import ToolButtons from '../components/core/Whiteboard/ToolButtons';
-import { TOOLS } from '../utils/Constants';
+import { useDispatch } from 'react-redux';
+import { setTool } from '../slices/toolSlice';
+import { setScribbles } from '../slices/scribbleSlice';
 
 const WhiteBoard = () => {
-  const [tool, setTool] = useState(TOOLS?.SELECT);
+  const dispatch = useDispatch();
   const [scribbles, setScribbles] = useState([]);
   const [fillColor, setFillColor] = useState("#ff0000");
   const [fillInnerColor, setFillInnerColor] = useState("#ff0000");
   const [rectangles , setRectangles] = useState([]);
 
   const handleToolChange = (tool) => {
-    setTool(tool);
-    console.log("Tool value", tool);
+    console.log("change --", tool);
+    dispatch(setTool(tool));
   };
 
   return (
     <div>
       <ToolButtons 
-        tool={tool} 
         handleToolChange={handleToolChange} 
         fillColor={fillColor} 
         setFillColor={setFillColor}
@@ -26,7 +27,6 @@ const WhiteBoard = () => {
         setFillInnerColor={setFillInnerColor}
       />
       <DrawingStage 
-        tool={tool} 
         scribbles={scribbles} 
         setScribbles={setScribbles} 
         rectangles={rectangles}

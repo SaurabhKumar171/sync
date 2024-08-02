@@ -2,11 +2,20 @@ import React, { useRef } from 'react';
 import { Arrow, Circle,  Layer, Line, Rect, Stage, Text , Transformer } from 'react-konva';
 import { v4 as uuidv4 } from 'uuid';
 import { TOOLS } from '../../../utils/Constants';
+import { useSelector, useDispatch } from 'react-redux';
+import { addScribble, setScribbles } from '../../../slices/scribbleSlice';
 
-const DrawingStage = ({ tool, scribbles, setScribbles, rectangles, setRectangles, fillColor, fillInnerColor }) => {
+const DrawingStage = ({ rectangles, setRectangles, fillColor, fillInnerColor }) => {
+  const dispatch = useDispatch();
+
+  const tool = useSelector(state => state.tools);
+  const scribbles = useSelector(state => state.scribbles) || [];
   const isDrawing = useRef(false);
   const stageRef = useRef();
   const cuurentShapeId = useRef();
+
+  console.log(" Tool scribbles", scribbles);
+
 
   const handleMouseDown = (e) => {
 
@@ -26,15 +35,15 @@ const DrawingStage = ({ tool, scribbles, setScribbles, rectangles, setRectangles
     switch(tool){
       case TOOLS.SCRIBBLE : 
       case TOOLS.ERASE : 
-        setScribbles((scribble) => [
-                      ...scribble, 
+        dispatch(addScribble(
                       { 
                         id, 
                         points: [x, y], 
                         color : fillColor ,
                         tool  : tool
                       }
-                    ]);
+                    )
+                  );
         break;
       
       case TOOLS.RECTANGLE : 
@@ -70,17 +79,17 @@ const DrawingStage = ({ tool, scribbles, setScribbles, rectangles, setRectangles
       switch(tool){
         case TOOLS.SCRIBBLE : 
         case TOOLS.ERASE : 
-          setScribbles((scribble) => 
-            scribble.map((scribbleItem) => {
-              if(scribbleItem.id === cuurentShapeId.current){
-                return {
-                  ...scribbleItem,
-                  points: [...scribbleItem.points, x, y],
-                  // color : fillColor
+          dispatch(setScribbles(scribbles.map((scribbleItem) => {
+                if(scribbleItem.id === cuurentShapeId.current){
+                  return {
+                    ...scribbleItem,
+                    points: [...scribbleItem.points, x, y],
+                    // color : fillColor
+                  }
                 }
-              }
-              return scribbleItem;
-            })
+                return scribbleItem;
+              })
+            )
           );
           break;
 
